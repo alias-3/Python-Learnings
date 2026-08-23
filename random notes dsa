@@ -1,0 +1,71 @@
+cpp heap pop doesnt return anything, python returns the popped element, so cpp needs top->pop, python can do the same in pop to retreive the top element
+
+===========================================================
+'if' after 'for' in a comprehension = filter (no else allowed).
+'if...else' before 'for' in a comprehension = ternary expression (else required).
+
+[x for x in nums if x > 0]              # filter — keeps only positives
+[x if x > 0 else 0 for x in nums]       # ternary — replaces negatives with 0
+
+
+===========================================================
+
+Lambda is used when a function is needed as an argument to something else — sorted, map, filter, key=.
+
+sorted(people, key=lambda p: p['age'])
+list(filter(lambda x: x > 0, nums))
+list(map(lambda x: x * 2, nums))
+
+classify = lambda x: "even" if x % 2 == 0 else "odd"
+classify(4)   # 'even'
+
+
+
+===========================================================
+# Ternary: pick a VALUE
+x = "yes" if cond else "no"
+
+# Lambda: define a FUNCTION (can contain a ternary inside)
+f = lambda x: "yes" if x > 0 else "no"
+
+# List comprehension with filter: pick which ITEMS to KEEP
+[x for x in nums if x > 0]
+
+# List comprehension with ternary: pick a VALUE for every item
+[x if x > 0 else 0 for x in nums]
+
+
+===========================================================
+
+Do not use [[]] * n. That creates N references to the exact same empty 
+list in memory, so appending to one will append to all of them.
+
+===========================================================
+
+numbers = [10, 20, 30, 40]
+
+# Fastest with map():
+result = " -> ".join(map(str, numbers))
+print(result)  # "10 -> 20 -> 30 -> 40"
+
+===========================================================
+
+to convert to string from some iterable 
+
+''.join(iterable/list)
+
+
+============================================================
+
+
+# A matrix with 8 rows and 7 columns
+matrix = [[0] * 7 for _ in range(8)]
+
+# 1. Get number of rows (m)
+m = len(matrix)
+
+# 2. Get number of columns (n)
+n = len(matrix[0])
+
+print(f"Rows (m): {m}")     # Output: Rows (m): 8
+print(f"Cols (n): {n}")     # Output: Cols (n): 7
