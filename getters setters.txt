@@ -1,0 +1,164 @@
+Exactly right on both counts. Let me make it concrete:
+
+---
+
+## The getter and setter are just functions — the names are flexible
+
+```python
+class Artist:
+    @property
+    def popstar(self):          # property is accessed as p.popstar
+        return self._batman     # can return ANY attribute, not necessarily _popstar
+
+    @popstar.setter
+    def popstar(self, value):
+        self._robin = value     # can store to ANY attribute, not necessarily _popstar
+```
+
+This is valid Python. `p.popstar` reads from `_batman`, and `p.popstar = x` stores into `_robin`. Weird and confusing, but legal.
+
+---
+
+## The setter doesn't even have to store anything
+
+It's just a function that runs when you do `p.popstar = value`. You can put any logic in it:
+
+```python
+class Artist:
+    def __init__(self):
+        self._log = []
+
+    @property
+    def popstar(self):
+        return "Taylor Swift"       # hardcoded, doesn't read any attribute
+
+    @popstar.setter
+    def popstar(self, value):
+        self._log.append(value)     # doesn't store to _popstar at all
+        print(f"Someone tried to set popstar to {value}, logged it")
+```
+
+```python
+a = Artist()
+print(a.popstar)        # "Taylor Swift"
+a.popstar = "Beyonce"   # prints the message, appends to _log, stores nothing as "popstar"
+print(a.popstar)        # still "Taylor Swift"
+```
+
+---
+
+## What actually ties getter and setter together
+
+The **only** thing connecting them is the decorator chain — `@property` defines the name, and `@popstar.setter` attaches to that same name. The internal logic is completely up to you:
+
+```python
+@property
+def popstar(self):          # defines the property named "popstar"
+    ...
+
+@popstar.setter             # attaches setter to the "popstar" property
+def popstar(self, value):   # function name must match — but internals are free
+    ...
+```
+
+The function name in `@popstar.setter` must match the property name — that's the only hard rule. Everything inside the body is just Python.
+
+---
+
+## So the convention of `_popstar` is just that — a convention
+
+The reason everyone uses `_samename` as the backing store is **clarity** — future readers immediately understand what's stored where. But the language doesn't require it. The only actual constraint is:
+
+> The backing store (wherever you read/write the real value) must not share the same name as the property itself — or you get infinite recursion.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Exactly right. If you want a `@property` named `popstar`, you **cannot** also store the value in `self.popstar` — it would recurse infinitely. You need a different name for the backing store.
+
+Your options:
+
+---
+
+**Option 1 — underscore prefix (standard convention)**
+```python
+class Artist:
+    def __init__(self, popstar):
+        self.popstar = popstar      # triggers setter → stores in self._popstar
+
+    @property
+    def popstar(self):
+        return self._popstar        # ✅ different name, no recursion
+
+    @popstar.setter
+    def popstar(self, value):
+        self._popstar = value.title()   # e.g. auto-capitalize
+```
+
+---
+
+**Option 2 — any different name at all**
+```python
+@property
+def popstar(self):
+    return self._ps         # backing store can be called anything
+
+@popstar.setter
+def popstar(self, value):
+    self._ps = value
+```
+Works, but `_popstar` is universally understood — stick with that.
+
+---
+
+**Option 3 — name mangling**
+```python
+@property
+def popstar(self):
+    return self.__popstar
+
+@popstar.setter
+def popstar(self, value):
+    self.__popstar = value
+```
+Also works — `__popstar` gets mangled to `_Artist__popstar` so no collision. But overkill unless you specifically need subclass protection.
+
+---
+
+## The one thing you can never do
+
+```python
+@property
+def popstar(self):
+    return self.popstar     # 💥 RecursionError — calls itself forever
+
+@popstar.setter
+def popstar(self, value):
+    self.popstar = value    # 💥 RecursionError — same problem in the setter
+```
+
+So the rule is simply: **the backing store must have a different name than the property.** `_popstar` is just the convention everyone uses for that.
