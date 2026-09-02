@@ -69,3 +69,9 @@ n = len(matrix[0])
 
 print(f"Rows (m): {m}")     # Output: Rows (m): 8
 print(f"Cols (n): {n}")     # Output: Cols (n): 7
+
+============================================================
+
+int(a / b) chops off the decimal (truncates toward zero).
+
+a // b rounds down (toward negative infinity).
